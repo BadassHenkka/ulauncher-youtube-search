@@ -1,5 +1,9 @@
 import logging
+import gi
+gi.require_version('Gdk', '3.0')
+
 from youtubeSearch import YoutubeSearch
+
 from ulauncher.api.client.Extension import Extension
 from ulauncher.api.client.EventListener import EventListener
 from ulauncher.api.shared.event import KeywordQueryEvent
@@ -14,9 +18,9 @@ logger = logging.getLogger(__name__)
 icon_file='images/icon.png'
 
 
-class YoutubeSeachExtension(Extension):
+class YoutubeSearchExtension(Extension):
     def __init__(self):
-        super(YoutubeSeachExtension, self).__init__()
+        super(YoutubeSearchExtension, self).__init__()
         self.subscribe(KeywordQueryEvent, KeywordQueryEventListener())
 
 
@@ -35,7 +39,6 @@ class KeywordQueryEventListener(EventListener):
 
         result_dict = YoutubeSearch.perform_search(query)
         logger.debug('Obtained result' + str(result_dict))
-
         
         if not result_dict:
              return RenderResultListAction([
@@ -46,13 +49,14 @@ class KeywordQueryEventListener(EventListener):
                 )
             ])
 
-
-        return RenderResultListAction([ ExtensionResultItem(
+        return RenderResultListAction([
+            ExtensionResultItem(
                 icon=icon_file,
                 name=title,
                 description='',
                 on_enter= OpenUrlAction("https://youtube.com" + url))
-                for title, url in result_dict.items() ])
+            for title, url in result_dict.items()
+        ])
 
 if __name__ == "__main__":
-    YoutubeSeachExtension().run()
+    YoutubeSearchExtension().run()
